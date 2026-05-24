@@ -1,0 +1,102 @@
+---
+export interface AgentData {
+  id: string;
+  name: string;
+  displayName: string;
+  category: string;
+  description: string;
+  website?: string;
+  github?: string;
+  twitter?: string;
+  pricing?: string;
+  stars?: string;
+  featured?: boolean;
+}
+
+export interface Props {
+  agent: AgentData;
+}
+
+const { agent } = Astro.props;
+const displayName = agent.displayName || agent.name;
+
+// Pricing badge color
+let pricingClass = 'free';
+if (agent.pricing) {
+  const p = agent.pricing.toLowerCase();
+  if (p.includes('enterprise') || p.includes('paid') || p.includes('$')) {
+    if (p.includes('free') && (p.includes('/') || p.includes('$'))) pricingClass = 'free';
+    else if (p.includes('enterprise')) pricingClass = 'enterprise';
+    else pricingClass = 'paid';
+  }
+}
+
+// Avatar color based on category
+const avatarColors: Record<string, string> = {
+  coding: 'linear-gradient(135deg,#58a6ff,#1f6feb)',
+  framework: 'linear-gradient(135deg,#bc8cff,#8957e5)',
+  browser: 'linear-gradient(135deg,#39d2c0,#1ea889)',
+  voice: 'linear-gradient(135deg,#f778ba,#db2780)',
+  creative: 'linear-gradient(135deg,#f0883e,#d4762e)',
+  task: 'linear-gradient(135deg,#3fb950,#2d9b40)',
+  support: 'linear-gradient(135deg,#58a6ff,#1f6feb)',
+  research: 'linear-gradient(135deg,#d29922,#b5841e)',
+  local: 'linear-gradient(135deg,#8b949e,#6e7681)',
+  'multi-agent': 'linear-gradient(135deg,#bc8cff,#8957e5)',
+  protocol: 'linear-gradient(135deg,#39d2c0,#1ea889)',
+  models: 'linear-gradient(135deg,#f0883e,#d4762e)',
+  observability: 'linear-gradient(135deg,#58a6ff,#1f6feb)',
+  safety: 'linear-gradient(135deg,#f85149,#cf3d36)',
+  cybersecurity: 'linear-gradient(135deg,#f85149,#cf3d36)',
+  healthcare: 'linear-gradient(135deg,#f778ba,#db2780)',
+  web3: 'linear-gradient(135deg,#f0883e,#d4762e)',
+};
+---
+
+<div class="agent-card">
+  <div class="card-top">
+    <div class="avatar" style={`background: ${avatarColors[agent.category] || avatarColors.coding}`}>
+      {displayName[0]}
+    </div>
+    <div class="card-info">
+      <div class="card-name">
+        {displayName}
+        {agent.featured && <span class="featured-badge">⭐ 推荐</span>}
+      </div>
+      <div class="card-sub">
+        @{agent.name}
+        {agent.stars && <span class="card-stars">★ {agent.stars}</span>}
+      </div>
+    </div>
+    {agent.pricing && (
+      <span class={`card-pricing ${pricingClass}`}>{agent.pricing}</span>
+    )}
+  </div>
+
+  <div class="card-desc">
+    {agent.description || '暂无描述'}
+  </div>
+
+  <div class="card-links">
+    {agent.website && (
+      <a href={agent.website} target="_blank" rel="noopener noreferrer" class="btn-primary" data-agent={agent.name}>
+        访问 →
+      </a>
+    )}
+    {agent.github && (
+      <a href={agent.github} target="_blank" rel="noopener noreferrer" class="btn-secondary" title="GitHub">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    )}
+  </div>
+</div>
+
+<script>
+  // Click tracking to backend
+  document.querySelectorAll('a[data-agent]').forEach((link: Element) => {
+    link.addEventListener('click', () => {
+      const agentName = link.getAttribute('data-agent');
+      fetch(`/api/v1/agents/${agentName}/click`, { method: 'POST' }).catch(() => {});
+    });
+  });
+</script>

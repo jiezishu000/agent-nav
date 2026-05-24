@@ -1,0 +1,125 @@
+---
+// Agent Nav - Base Layout with Sidebar + Dark Theme
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  currentCategory?: string;
+}
+
+const { title = 'Agent Nav - AI Agent 导航站', description = '发现最新最好用的 AI Agent，340+ 工具覆盖 20+ 分类', currentCategory = 'all' } = Astro.props;
+
+const navItems = [
+  { id: 'all', label: '全部', icon: '🏠' },
+  { id: 'featured', label: '精选推荐', icon: '⭐' },
+  { id: 'coding', label: '编码 Agent', icon: '💻' },
+  { id: 'framework', label: 'Agent 框架', icon: '🧱' },
+  { id: 'browser', label: '浏览器 Agent', icon: '🌐' },
+  { id: 'creative', label: '创意 AI', icon: '🎨' },
+  { id: 'voice', label: '语音 Agent', icon: '🎙️' },
+  { id: 'task', label: '工作流自动化', icon: '⚡' },
+  { id: 'support', label: '客服与 CRM', icon: '💼' },
+  { id: 'research', label: '数据与研究', icon: '📊' },
+  { id: 'local', label: '本地部署', icon: '🏠' },
+  { id: 'multi-agent', label: '多 Agent 平台', icon: '🤖' },
+  { id: 'protocol', label: '协议与标准', icon: '📡' },
+  { id: 'models', label: '开源模型', icon: '🧠' },
+  { id: 'observability', label: '可观测性', icon: '🔍' },
+  { id: 'safety', label: '安全与护栏', icon: '🛡️' },
+  { id: 'cybersecurity', label: '网络安全', icon: '🔐' },
+  { id: 'healthcare', label: '医疗健康', icon: '🏥' },
+  { id: 'web3', label: 'Web3 Agent', icon: '🔗' },
+];
+
+const sidebarSections = [
+  { label: '概览', items: ['all', 'featured'] },
+  { label: '开发工具', items: ['coding', 'framework', 'browser'] },
+  { label: '创意与多媒体', items: ['creative', 'voice'] },
+  { label: '业务与自动化', items: ['task', 'support', 'research'] },
+  { label: '部署与平台', items: ['local', 'multi-agent', 'protocol', 'models'] },
+  { label: '安全与合规', items: ['observability', 'safety', 'cybersecurity', 'healthcare'] },
+  { label: 'Web3', items: ['web3'] },
+];
+
+function getNavItem(id: string) {
+  return navItems.find(n => n.id === id);
+}
+
+const currentNav = getNavItem(currentCategory);
+const pageTitle = currentNav ? `${currentNav.label} - ${title}` : `Agent Nav - ${title}`;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{pageTitle}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="logo">
+      <span>◆</span> Agent <span>Nav</span>
+      <span class="tag" style="margin-left:6px;">340+ 工具</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link active">导航站</a>
+      <a href="/submit" class="nav-link">提交 Agent</a>
+      <a href="/about" class="nav-link">关于</a>
+    </div>
+    <div class="header-right">
+      <a href="/register" style="padding:6px 14px;border-radius:6px;background:var(--blue);color:#fff;font-size:12px;font-weight:600;text-decoration:none;">注册</a>
+      <a href="/login" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);color:var(--text-dim);font-size:12px;text-decoration:none;">登录</a>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      {sidebarSections.map(section => (
+        <div>
+          <div class="sidebar-section">{section.label}</div>
+          {section.items.map(id => {
+            const item = getNavItem(id);
+            if (!item) return null;
+            return (
+              <a
+                href={id === 'all' ? '/' : `/#${id}`}
+                class={`sidebar-item ${currentCategory === id || (id === 'all' && currentCategory === 'all') ? 'active' : ''}`}
+              >
+                <span class="icon">{item.icon}</span>
+                {item.label}
+              </a>
+            );
+          })}
+        </div>
+      ))}
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <slot />
+    </main>
+  </div>
+
+  <!-- Mobile toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+
+  <script>
+    const toggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+      sidebar.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 900) sidebar.classList.remove('open');
+        });
+      });
+    }
+  </script>
+</body>
+</html>

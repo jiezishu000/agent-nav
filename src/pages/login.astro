@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="登录 - Agent Nav">
+  <div style="max-width:440px;margin:40px auto;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;">
+      <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">欢迎回来</h1>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:24px;">登录后体验完整功能</p>
+
+      <form id="login-form" style="display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">邮箱</label>
+          <input type="email" id="login-email" required
+            style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor=''" />
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">密码</label>
+          <input type="password" id="login-password" required
+            style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor=''" />
+        </div>
+        <button type="submit"
+          style="padding:10px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">
+          登录
+        </button>
+      </form>
+
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+        <p style="font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:12px;">第三方登录</p>
+        <div style="display:flex;gap:12px;">
+          <button onclick="alert('GitHub OAuth 即将开放')"
+            style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;cursor:pointer;">
+            GitHub
+          </button>
+          <button onclick="alert('Google OAuth 即将开放')"
+            style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;cursor:pointer;">
+            Google
+          </button>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;font-size:12px;color:var(--text-dim);text-align:center;">
+        没有账号？<a href="/register" style="color:var(--blue);">立即注册</a>
+      </p>
+
+      <div id="login-msg" style="display:none;margin-top:16px;padding:10px;border-radius:var(--radius-sm);font-size:12px;"></div>
+    </div>
+
+    <!-- Token display (hidden after login) -->
+    <div id="token-display" style="display:none;margin-top:16px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);">
+      <p style="font-size:12px;font-weight:600;margin-bottom:8px;">登录成功！Access Token：</p>
+      <pre id="token-value" style="font-size:10px;color:var(--text-dim);word-break:break-all;white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:4px;"></pre>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('login-form');
+  const msgEl = document.getElementById('login-msg');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById('login-email') as HTMLInputElement).value;
+    const password = (document.getElementById('login-password') as HTMLInputElement).value;
+    try {
+      const res = await fetch('http://localhost:8000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ username: email, password }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        msgEl!.style.display = 'block';
+        msgEl!.style.background = 'rgba(63,185,80,0.1)';
+        msgEl!.style.color = 'var(--green)';
+        msgEl!.textContent = '登录成功！Token 已保存';
+        localStorage.setItem('access_token', data.access_token);
+        const td = document.getElementById('token-display');
+        const tv = document.getElementById('token-value');
+        if (td && tv) {
+          td.style.display = 'block';
+          tv.textContent = data.access_token;
+        }
+      } else {
+        const err = await res.json();
+        msgEl!.style.display = 'block';
+        msgEl!.style.background = 'rgba(248,81,73,0.1)';
+        msgEl!.style.color = 'var(--red)';
+        msgEl!.textContent = err.detail || '登录失败，请检查邮箱和密码';
+      }
+    } catch {
+      msgEl!.style.display = 'block';
+      msgEl!.style.background = 'rgba(248,81,73,0.1)';
+      msgEl!.style.color = 'var(--red)';
+      msgEl!.textContent = '无法连接服务器，请确保后端已启动';
+    }
+  });
+</script>

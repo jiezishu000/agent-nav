@@ -1,0 +1,163 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="提交 Agent - Agent Nav">
+  <div style="max-width:640px;margin:0 auto;">
+    <div style="margin-bottom:24px;">
+      <h1 style="font-size:24px;font-weight:700;margin-bottom:4px;">提交 Agent</h1>
+      <p style="font-size:13px;color:var(--text-dim);">推荐你喜欢的 AI Agent 工具，审核通过后将在导航站展示</p>
+    </div>
+
+    <form id="submit-form" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">名称 *</label>
+        <input type="text" id="sub-name" required
+          style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;"
+          placeholder="例如：Cursor" />
+      </div>
+
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">分类 *</label>
+        <select id="sub-category" required
+          style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;">
+          <option value="">选择分类</option>
+          <option value="coding">编码 Agent</option>
+          <option value="framework">Agent 框架</option>
+          <option value="browser">浏览器 Agent</option>
+          <option value="voice">语音 Agent</option>
+          <option value="creative">创意 AI</option>
+          <option value="task">工作流自动化</option>
+          <option value="support">客服与 CRM</option>
+          <option value="research">数据与研究</option>
+          <option value="local">本地部署</option>
+          <option value="multi-agent">多 Agent 平台</option>
+          <option value="protocol">协议与标准</option>
+          <option value="models">开源模型</option>
+          <option value="observability">可观测性</option>
+          <option value="safety">安全与护栏</option>
+          <option value="cybersecurity">网络安全</option>
+          <option value="healthcare">医疗健康</option>
+          <option value="web3">Web3 Agent</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">描述 *</label>
+        <textarea id="sub-desc" required rows="3"
+          style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;resize:vertical;"
+          placeholder="用一句话描述这个 Agent 的功能和特点"></textarea>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">官网链接 *</label>
+        <input type="url" id="sub-website" required
+          style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;"
+          placeholder="https://example.com" />
+      </div>
+
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">GitHub 链接（选填）</label>
+        <input type="url" id="sub-github"
+          style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none;"
+          placeholder="https://github.com/username/repo" />
+      </div>
+
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-dim);">定价模式</label>
+        <div style="display:flex;gap:12px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="pricing" value="Free" checked /> 免费
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="pricing" value="Paid" /> 付费
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="pricing" value="Freemium" /> Freemium
+          </label>
+        </div>
+      </div>
+
+      <button type="submit"
+        style="padding:12px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;">
+        提交审核
+      </button>
+    </form>
+
+    <div id="sub-msg" style="display:none;margin-top:16px;padding:12px;border-radius:var(--radius-sm);font-size:13px;"></div>
+
+    <div style="margin-top:20px;padding:16px;border-radius:var(--radius);background:var(--card);border:1px solid var(--border);font-size:12px;color:var(--text-dim);">
+      <strong>提交须知：</strong>
+      <ul style="margin-top:4px;padding-left:16px;">
+        <li>提交后我们会在 48 小时内审核</li>
+        <li>确保 Agent 真实可用，描述准确</li>
+        <li>请勿提交重复或已收录的 Agent</li>
+        <li>审核通过后将显示在对应分类中</li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('submit-form');
+  const msgEl = document.getElementById('sub-msg');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = (document.getElementById('sub-name') as HTMLInputElement).value.trim();
+    const category = (document.getElementById('sub-category') as HTMLSelectElement).value;
+    const desc = (document.getElementById('sub-desc') as HTMLTextAreaElement).value.trim();
+    const website = (document.getElementById('sub-website') as HTMLInputElement).value.trim();
+    const github = (document.getElementById('sub-github') as HTMLInputElement).value.trim();
+    const pricing = (document.querySelector('input[name="pricing"]:checked') as HTMLInputElement)?.value || 'Free';
+
+    if (!name || !category || !desc || !website) {
+      msgEl!.style.display = 'block';
+      msgEl!.style.background = 'rgba(248,81,73,0.1)';
+      msgEl!.style.color = 'var(--red)';
+      msgEl!.textContent = '请填写所有必填项';
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('http://localhost:8000/api/v1/agents/', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          agent_name: name.toLowerCase().replace(/\\s+/g, '-'),
+          display_name: name,
+          category,
+          description: desc,
+          website_url: website,
+          github_url: github || undefined,
+          pricing,
+        }),
+      });
+      if (res.ok || res.status === 201) {
+        msgEl!.style.display = 'block';
+        msgEl!.style.background = 'rgba(63,185,80,0.1)';
+        msgEl!.style.color = 'var(--green)';
+        msgEl!.textContent = '提交成功！审核通过后将展示在导航站。';
+        form.reset();
+      } else if (res.status === 401) {
+        msgEl!.style.display = 'block';
+        msgEl!.style.background = 'rgba(248,81,73,0.1)';
+        msgEl!.style.color = 'var(--red)';
+        msgEl!.textContent = '需要登录才能提交。请先登录';
+      } else {
+        const err = await res.json();
+        msgEl!.style.display = 'block';
+        msgEl!.style.background = 'rgba(248,81,73,0.1)';
+        msgEl!.style.color = 'var(--red)';
+        msgEl!.textContent = err.detail || '提交失败，请重试';
+      }
+    } catch {
+      msgEl!.style.display = 'block';
+      msgEl!.style.background = 'rgba(248,81,73,0.1)';
+      msgEl!.style.color = 'var(--red)';
+      msgEl!.textContent = '无法连接服务器，请确保后端已启动';
+    }
+  });
+</script>

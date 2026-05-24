@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="关于 - Agent Nav">
+  <div style="max-width:720px;margin:0 auto;">
+    <div style="margin-bottom:28px;">
+      <h1 style="font-size:24px;font-weight:700;margin-bottom:8px;">关于 Agent Nav</h1>
+      <p style="font-size:13px;color:var(--text-dim);">AI Agent 导航站 — 发现最好用的 AI Agent 工具</p>
+    </div>
+
+    <div class="strat-box" style="margin-bottom:20px;">
+      <h3>项目简介</h3>
+      <p style="font-size:13px;color:var(--text-dim);line-height:1.7;">
+        Agent Nav 是一个精心整理的 AI Agent 导航站，收录了 340+ AI Agent 工具，覆盖 20+ 分类。
+        我们从 GitHub 高星仓库、社区推荐和官方渠道收集数据，每月更新，帮助开发者快速发现和选择适合的 AI Agent 工具。
+      </p>
+    </div>
+
+    <div class="strat-box" style="margin-bottom:20px;">
+      <h3>数据来源</h3>
+      <ul>
+        <li><a href="https://github.com/caramaschiHG/awesome-ai-agents-2026" target="_blank">awesome-ai-agents-2026</a> — 340+ AI Agent 收录</li>
+        <li><a href="https://github.com/adrianwedd/Agentic-Index" target="_blank">Agentic-Index</a> — Agent 生态全景</li>
+        <li>GitHub 高星仓库实时追踪</li>
+        <li>社区贡献与推荐</li>
+      </ul>
+    </div>
+
+    <div class="strat-box" style="margin-bottom:20px;">
+      <h3>功能特性</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;">
+        <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+          <div style="font-size:20px;margin-bottom:4px;">🔍</div>
+          <div style="font-size:13px;font-weight:600;">智能搜索</div>
+          <div style="font-size:11px;color:var(--text-dim);">实时搜索 Agent 名称、描述和分类</div>
+        </div>
+        <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+          <div style="font-size:20px;margin-bottom:4px;">🏷️</div>
+          <div style="font-size:13px;font-weight:600;">分类筛选</div>
+          <div style="font-size:11px;color:var(--text-dim);">20+ 分类覆盖全品类 AI Agent</div>
+        </div>
+        <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+          <div style="font-size:20px;margin-bottom:4px;">⭐</div>
+          <div style="font-size:13px;font-weight:600;">精选推荐</div>
+          <div style="font-size:11px;color:var(--text-dim);">编辑精选的最佳 Agent 工具</div>
+        </div>
+        <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+          <div style="font-size:20px;margin-bottom:4px;">📊</div>
+          <div style="font-size:13px;font-weight:600;">数据统计</div>
+          <div style="font-size:11px;color:var(--text-dim);">实时显示收录总数和分类统计</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="strat-box" style="margin-bottom:20px;">
+      <h3>技术栈</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+        <span class="tag">Astro 6</span>
+        <span class="tag purple">Tailwind v4</span>
+        <span class="tag green">FastAPI</span>
+        <span class="tag orange">SQLAlchemy 2.0</span>
+        <span class="tag yellow">SQLite</span>
+        <span class="tag red">JWT Auth</span>
+      </div>
+    </div>
+
+    <div class="strat-box">
+      <h3>服务条款</h3>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.7;">
+        Agent Nav 仅做工具收录和展示，不保证所有信息的准确性和时效性。
+        每个工具的版权和运营权归其开发者所有。
+        如果你认为某个工具信息有误，或希望移除你的工具，请通过 GitHub Issue 联系我们。
+      </p>
+    </div>
+  </div>
+</BaseLayout>

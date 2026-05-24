@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AgentCard from '../components/AgentCard.astro';
+import agentsData from '../data/agents.json';
+
+// All agents data (used at build time for static generation)
+const allAgents = agentsData;
+
+// Stats
+const totalAgents = allAgents.length;
+const featuredCount = allAgents.filter(a => a.featured).length;
+const freeCount = allAgents.filter(a => a.pricing && a.pricing.toLowerCase().includes('free')).length;
+const openSourceCount = allAgents.filter(a => a.github).length;
+
+// Categories
+const categoryCounts: Record<string, number> = {};
+allAgents.forEach(a => {
+  categoryCounts[a.category] = (categoryCounts[a.category] || 0) + 1;
+});
+const categories = Object.keys(categoryCounts).sort();
+
+const categoryLabels: Record<string, string> = {
+  coding: '编码 Agent', framework: 'Agent 框架', browser: '浏览器 Agent',
+  voice: '语音 Agent', creative: '创意 AI', task: '工作流自动化',
+  support: '客服与 CRM', research: '数据与研究', local: '本地部署',
+  'multi-agent': '多 Agent 平台', protocol: '协议与标准', models: '开源模型',
+  observability: '可观测性', safety: '安全与护栏', cybersecurity: '网络安全',
+  healthcare: '医疗健康', web3: 'Web3 Agent',
+};
+---
+
+<BaseLayout title="Agent Nav - AI Agent 导航站">
+  <!-- Stats Bar -->
+  <div class="stats">
+    <div class="stat-card blue"><div class="num">{totalAgents}</div><div class="label">收录 Agent 总数</div></div>
+    <div class="stat-card purple"><div class="num">{categories.length}</div><div class="label">覆盖分类</div></div>
+    <div class="stat-card green"><div class="num">{featuredCount}</div><div class="label">精选推荐</div></div>
+    <div class="stat-card yellow"><div class="num">{freeCount}</div><div class="label">免费工具</div></div>
+    <div class="stat-card orange"><div class="num">{openSourceCount}</div><div class="label">开源项目</div></div>
+  </div>
+
+  <!-- Hero -->
+  <div class="section">
+    <div style="margin-bottom:16px;">
+      <h1 style="font-size:24px;font-weight:700;margin-bottom:4px;" id="page-title">📂 全部 Agent</h1>
+      <p style="font-size:13px;color:var(--text-dim);">
+        共 <strong id="agent-count">{totalAgents}</strong> 个工具，从 GitHub 高星仓库 + 社区精选整理，每月更新
+      </p>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="agent-search" placeholder="搜索 Agent 名称、描述、分类..." />
+    </div>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="category-filter" id="category-filter">
+    <button class="category-btn active" data-cat="all">全部</button>
+    <button class="category-btn" data-cat="featured">⭐ 精选</button>
+    {categories.map(cat => (
+      <button class="category-btn" data-cat={cat}>
+        {categoryLabels[cat] || cat}
+        <span style="font-size:10px;color:var(--text-muted);margin-left:3px;">{categoryCounts[cat]}</span>
+      </button>
+    ))}
+  </div>
+
+  <!-- Agent Grid -->
+  <div class="section">
+    <div class="agent-grid" id="agent-grid">
+      {allAgents.map(agent => (
+        <div class="agent-grid-item" data-category={agent.category} data-featured={agent.featured ? 'true' : 'false'}>
+          <AgentCard agent={agent} />
+        </div>
+      ))}
+    </div>
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="empty-icon">🔍</div>
+      <p>没有找到匹配的 Agent</p>
+      <p style="font-size:12px;margin-top:4px;">试试其他分类或搜索关键词</p>
+    </div>
+  </div>
+
+  <!-- Invite Section -->
+  <div class="invite-section">
+    <h2>邀请好友，延长试用</h2>
+    <p>每邀请一位好友注册，你和好友各获得 <strong style="color:var(--blue);">+3 天</strong> 免费试用</p>
+    <div class="invite-input">
+      <input type="text" id="invite-link" value="https://agent-nav.vercel.app/?ref=YOUR_CODE" readonly />
+      <button onclick="copyInviteLink()">复制链接</button>
+    </div>
+    <p style="margin-top:12px;font-size:12px;color:var(--text-dim);">新用户注册即送 <strong style="color:var(--green);">7 天</strong> 免费试用</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:40px;padding:20px 0;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);text-align:center;">
+    <p>数据来源：
+      <a href="https://github.com/caramaschiHG/awesome-ai-agents-2026" target="_blank" style="color:var(--blue);">awesome-ai-agents-2026</a> ·
+      <a href="https://github.com/adrianwedd/Agentic-Index" target="_blank" style="color:var(--blue);">Agentic-Index</a> ·
+      社区贡献
+    </p>
+    <p style="margin-top:4px;">Agent Nav v3.0 — AI Agent 导航站 | {totalAgents}+ 工具 {categories.length}+ 分类 | 每月更新</p>
+  </div>
+</BaseLayout>
+
+<script>
+  // Load initial category from hash or URL params
+  let currentCategory = window.location.hash.replace('#', '') || 'all';
+  // Also check URL params (?category=coding)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlCat = urlParams.get('category');
+  if (urlCat) currentCategory = urlCat;
+  applyCategory(currentCategory);
+
+  // Listen for hash changes (sidebar clicks)
+  window.addEventListener('hashchange', () => {
+    const cat = window.location.hash.replace('#', '') || 'all';
+    applyCategory(cat);
+  });
+
+  // Category filter buttons
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.getAttribute('data-cat') || 'all';
+      applyCategory(cat);
+      window.location.hash = cat;
+    });
+  });
+
+  // Search
+  const searchInput = document.getElementById('agent-search') as HTMLInputElement | null;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase().trim();
+      applyFilter(currentCategory, q);
+    });
+  }
+
+  function applyCategory(cat: string) {
+    currentCategory = cat;
+    // Update active button
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.querySelector(`.category-btn[data-cat="${cat}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+    // Also highlight sidebar
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    const targetId = cat === 'all' ? '' : cat;
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      const href = item.getAttribute('href');
+      if ((!targetId && href === '/') || (href === `/#${targetId}`) || (href === `/?category=${targetId}`)) {
+        item.classList.add('active');
+      }
+    });
+    // Apply with current search
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    applyFilter(cat, q);
+  }
+
+  function applyFilter(cat: string, q: string) {
+    const items = document.querySelectorAll('.agent-grid-item');
+    let visibleCount = 0;
+    items.forEach(item => {
+      const itemCat = item.getAttribute('data-category');
+      const isFeatured = item.getAttribute('data-featured') === 'true';
+      let categoryMatch = cat === 'all' || (cat === 'featured' ? isFeatured : itemCat === cat);
+      if (!categoryMatch) {
+        (item as HTMLElement).style.display = 'none';
+        return;
+      }
+      if (!q) {
+        (item as HTMLElement).style.display = '';
+        visibleCount++;
+        return;
+      }
+      // Text search within the card
+      const text = item.textContent?.toLowerCase() || '';
+      const match = text.includes(q);
+      (item as HTMLElement).style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+
+    // Update title and count
+    const titleMap: Record<string, string> = {
+      all: '📂 全部 Agent', featured: '⭐ 精选推荐',
+      coding: '💻 编码 Agent', framework: '🧱 Agent 框架', browser: '🌐 浏览器 Agent',
+      voice: '🎙️ 语音 Agent', creative: '🎨 创意 AI', task: '⚡ 工作流自动化',
+      support: '💼 客服与 CRM', research: '📊 数据与研究', local: '🏠 本地部署',
+      'multi-agent': '🤖 多 Agent 平台', protocol: '📡 协议与标准', models: '🧠 开源模型',
+      observability: '🔍 可观测性', safety: '🛡️ 安全与护栏', cybersecurity: '🔐 网络安全',
+      healthcare: '🏥 医疗健康', web3: '🔗 Web3 Agent',
+    };
+    const titleEl = document.getElementById('page-title');
+    if (titleEl) titleEl.textContent = titleMap[cat] || `📂 ${cat}`;
+    const countEl = document.getElementById('agent-count');
+    if (countEl) countEl.textContent = String(visibleCount);
+    const emptyEl = document.getElementById('empty-state');
+    if (emptyEl) emptyEl.style.display = visibleCount === 0 ? '' : 'none';
+  }
+
+  // Copy invite link
+  function copyInviteLink() {
+    const input = document.getElementById('invite-link') as HTMLInputElement | null;
+    if (!input) return;
+    navigator.clipboard.writeText(input.value).then(() => {
+      const btn = input.nextElementSibling as HTMLElement | null;
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '已复制!';
+        setTimeout(() => { btn.textContent = orig; }, 2000);
+      }
+    }).catch(() => { input.select(); });
+  }
+  (window as any).copyInviteLink = copyInviteLink;
+</script>

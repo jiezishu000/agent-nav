@@ -1,0 +1,19 @@
+{
+  "name": "agent-nav-frontend",
+  "version": "3.0.0",
+  "description": "AI Agent 导航站 — 340+ 工具 20+ 分类",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^6.3.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.0"
+  }
+}
